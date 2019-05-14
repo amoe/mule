@@ -9,7 +9,9 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "@types/bluebird": "^3.5.26",
     "@types/pouchdb": "^6.3.3",
+    "bluebird": "^3.5.4",
     "pouchdb": "^7.0.0",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",
