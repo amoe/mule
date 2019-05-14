@@ -1,11 +1,14 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
+    <textarea cols="80" rows="25" v-model="jsonInput">
+    </textarea>
+
+    <button v-on:click="write">Write</button>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+    import Vue from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 import PouchDB from 'pouchdb';
 import Promise from 'bluebird';
@@ -18,78 +21,81 @@ function makeSleep() {
     return new Promise(resolve => setTimeout(resolve, 5000));
 }
 
-const DOCUMENT_NAME = 'mydoc2'
+const DOCUMENT_NAME = 'main';
+const ID_PROPERTY = '_id';
+const REV_PROPERTY = '_rev';
+
 const sampleDocument = {
     "_id": DOCUMENT_NAME,
     "meaningOfLife": 42
 };
 
+function getDatabase(): PouchDB.Database<Document> {
+    return new PouchDB<Document>(
+        "http://localhost:5984/alice",
+        {
+            'auth': {
+                'username': 'admin',
+                'password': 'admin'
+            }
+        }
+    );
+}
+
 
 export default Vue.extend({
     name: 'home',
-    mounted() {
-        this.$nextTick(() => {
-            console.log("inside mounted callback");
-
-            const db = new PouchDB<Document>(
-                "http://localhost:5984/alice",
-                {
-                    'auth': {
-                        'username': 'admin',
-                        'password': 'admin'
-                    }
-                }
-            );
-
-
-            // db.get(DOCUMENT_NAME).then(response => {
-            //     console.log("response is %o", response);
-            // }).catch(error => {
-            //     console.log("error is %o", error);
-            // });
-
-            db.put(sampleDocument).then(response => {
-                console.log("put worked, %o", response);
-            }).catch(error => {
-                console.log("put failed, %o", error);
-            });
-
-
-            // db.info().then(response => {
-            //     console.log("result is %o", response);
-            // });
+    data() {
+        return {
+            jsonInput: "",
+            couchdb: getDatabase()
+        };
+    },
+    created() {
+        this.couchdb.get(DOCUMENT_NAME).then(response => {
+            delete response[ID_PROPERTY];
+            delete response[REV_PROPERTY];
+            this.jsonInput = JSON.stringify(response);
+        }).catch (error => {
+            console.log("cannot read document");
         });
     },
     methods: {
-        // initialCreate(db) {
-        //     db.put(sampleDocument).then(response => {
-        //         console.log("put worked, %o", response);
-        //         this.updateExisting(db);
-        //     }).catch(error => {
-        //         console.log("put failed, %o", error);
-        //     });
-        // },
-        // updateExisting(db) {
-        //     db.get(DOCUMENT_NAME).then(response => {
-        //         return db.put({
-        //             "_id": DOCUMENT_NAME,
-        //             "_rev": response._rev,
-        //             "meaningOfLife": 43
-        //         });
-        //     }).then(response => {
-        //         console.log("update succeeded, %o", response);
-        //         this.postUpdateFetch(db);
-        //     }).catch(error => {
-        //         console.log("get failed, %o", error);
-        //     });
-        // },
-        // postUpdateFetch(db) {
-        //     db.get(DOCUMENT_NAME).then(response => {
-        //         console.log("post-update fetch succeeded, %o", response);
-        //     }).catch(error => {
-        //         console.log("post update fetch failed, %o", error);
-        //     });
-        // },
+        write() {
+            console.log("I would write");
+            
+            this.couchdb.put(this.currentDocument).then(response => {
+                console.log("put worked, %o", response);
+            }).catch(error => {
+                console.log("put failed, %o", error);
+                
+                if (error.name === 'conflict') {
+                    console.log("conflict, attempting update");
+                    return this.couchdb.get(DOCUMENT_NAME).then(response => {
+                        this.couchdb.put(
+                            Object.assign(
+                                {},
+                                this.currentDocument,
+                                {[REV_PROPERTY]: response._rev}
+                            )
+                        ).then(response => {
+                            console.log("updated successfully");
+                        }).catch(error => {
+                            console.log("update failed");
+                        });
+                    }).catch (error => {
+                        console.log("could not retrieve existent object");
+                    });
+                }
+            });
+        },
+    },
+    computed: {
+        currentDocument(): any {
+            const deserialized = JSON.parse(this.jsonInput);
+            deserialized[ID_PROPERTY] = DOCUMENT_NAME;
+            return deserialized;
+        }
     }
 });
 </script>
