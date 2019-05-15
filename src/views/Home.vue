@@ -1,6 +1,7 @@
 <template>
   <div class="home">
-    <el-select v-model="documentName">
+    <el-select v-model="documentName"
+               filterable>
       <el-option v-for="item in availableDocuments"
                  :key="item"
                  :label="item"
@@ -30,7 +31,7 @@
       {{treeData}}
     </textarea>
 
-    <button v-on:click="write">Write</button>
+    <el-button v-on:click="write">Write</el-button>
   </div>
 </template>
 
@@ -102,7 +103,7 @@ export default Vue.extend({
             this.dataService.update(this.documentName, {'tree': this.treeData}).then(response => {
                 this.$message("update worked");
             }).catch(error => {
-                console.log("update had error", error);
+                this.$message.error("update had error: " + error);
             });
         },
         handleNodeClick(node: OptionsNode) {
