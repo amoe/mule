@@ -40,7 +40,7 @@ import {DataService} from '@/data-service';
 function makeSleep() {
     return new Promise(resolve => setTimeout(resolve, 5000));
 }
-    
+
 function makeNamedCommand(name: string, node: any, data: any): NodeCommand {
     return {
         command: name,
@@ -74,44 +74,37 @@ export default Vue.extend({
         return {
             documentName: 'main',
             treeData: [] as OptionsNode[],
+            dataService: new DataService()
         };
     },
     created() {
-        const dataService = new DataService();
-
-        console.log("data service is %o", dataService);
-
-        const documentName = "main0";
-        const documentContent = {tree: []};
-
-        dataService.listAllDocuments();
         
-        dataService.update(documentName, documentContent).then(response => {
-            console.log("update worked");
-        }).catch(error => {
-            console.log("update had error", error);
-        });
-
-        dataService.getLatestVersion(documentName).then(document => {
+        console.log("data service is %o", this.dataService);
+        this.dataService.listAllDocuments();
+        
+        const loadingInstance = this.$loading({fullscreen: true});
+        
+        this.dataService.getLatestVersion(this.documentName).then(document => {
+            this.treeData = document.tree;
             console.log("retrieved a document %o", document);
+            loadingInstance.close();
         }).catch(error => {
-            console.log("something bad happend: %o", error);
+            this.$message.error("cannot read document " + error);
+            loadingInstance.close();
         });
-
+        
         console.log("secret is %o", process.env.VUE_APP_SECRET);
-
-        // const loadingInstance = this.$loading({fullscreen: true});
-
-        // this.couchdb.get(DOCUMENT_NAME).then(response => {
-        //     this.treeData = fromCouch(response);
-        //     loadingInstance.close();
-        // }).catch (error => {
-        //     this.$message.error("cannot read document");
-        //     loadingInstance.close();
-        // });
+        
+        
     },
     methods: {
         write() {
+            // should do an update
+            this.dataService.update(this.documentName, {'tree': this.treeData}).then(response => {
+                console.log("update worked");
+            }).catch(error => {
+                console.log("update had error", error);
+            });
         },
         handleNodeClick(node: OptionsNode) {
             //            node.label = "MERKED";
@@ -135,9 +128,6 @@ export default Vue.extend({
 
     },
     computed: {
-        couchTree(): any {
-            return toCouch(this.treeData, this.documentName);
-        }
     }
 });
 </script>
