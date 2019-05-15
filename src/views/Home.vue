@@ -40,34 +40,6 @@ import {DataService} from '@/data-service';
 function makeSleep() {
     return new Promise(resolve => setTimeout(resolve, 5000));
 }
-
-const DOCUMENT_NAME = 'main';
-const ID_PROPERTY = '_id';
-const REV_PROPERTY = '_rev';
-
-
-function getId(documentName: string): string {
-    if (documentName.includes(':')) {
-        throw new Error("bad documentname");
-    }
-
-    const timestamp: string = new Date().toISOString();
-    return documentName + ":" + timestamp;
-}
-
-function fromCouch(response: any): any {
-    return response.tree;
-}
-
-function toCouch(treeData: any, documentName: string): any {
-    const container = {
-        [ID_PROPERTY]: getId(documentName),
-        tree: treeData
-    };
-    
-    return container;
-}
-    
     
 function makeNamedCommand(name: string, node: any, data: any): NodeCommand {
     return {

@@ -1,11 +1,22 @@
 import PouchDB from 'pouchdb';
 import { DATABASE, USERNAME, PASSWORD } from '@/database-configuration';
 import { Document } from '@/types';
+import { cloneDeep } from 'lodash';
 
 type PDBCR = PouchDB.Core.Response;
 
 const ID_PROPERTY = '_id';
 const REV_PROPERTY = '_rev';
+
+function getId(documentName: string): string {
+    if (documentName.includes(':')) {
+        throw new Error("bad documentname");
+    }
+
+    const timestamp: string = new Date().toISOString();
+    return documentName + ":" + timestamp;
+}
+
 
 export class DataService {
     db: PouchDB.Database<Document>;
@@ -24,17 +35,17 @@ export class DataService {
 
     // should return response
     update(documentName: string, documentContent: Document): Promise<PDBCR> {
-        // XXX: FIxup the content first
+        const augmentedDocument: any = cloneDeep(documentContent);
+        augmentedDocument[ID_PROPERTY] = getId(documentName);
 
-
-        return this.db.put(documentContent).catch(error => {
+        return this.db.put(augmentedDocument).catch(error => {
             if (error.name === 'conflict') {
                 console.log("conflict, attempting update");
                 return this.db.get(documentName).then(response => {
                     return this.db.put(
                         Object.assign(
                             {},
-                            documentContent,
+                            augmentedDocument,
                             { [REV_PROPERTY]: response._rev }
                         )
                     );
