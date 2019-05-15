@@ -1,7 +1,8 @@
 <template>
   <div class="home">
     <el-select v-model="documentName"
-               filterable>
+               filterable
+               allow-create>
       <el-option v-for="item in availableDocuments"
                  :key="item"
                  :label="item"
@@ -40,7 +41,7 @@
 import PouchDB from 'pouchdb';
 import Promise from 'bluebird';
 import {ELEMENT_UI_DEMO_HIERARCHY} from '@/large-hierarchy';
-import {cloneDeep} from 'lodash';
+import {cloneDeep, includes} from 'lodash';
 import {OptionsNode, Document, NodeCommand} from '@/types';
 import {DataService} from '@/data-service';
 
@@ -88,16 +89,18 @@ export default Vue.extend({
     created() {
         console.log("data service is %o", this.dataService);
 
-        this.dataService.getDocumentNames().then(names => {
-            console.log("document names: %o", names);
-            this.availableDocuments = names;
-        }).catch(error => {
-            console.log("error: %o", error);
-        });
-
+        this.refreshAvailable();
         this.loadData(this.documentName);
     },
     methods: {
+        refreshAvailable() {
+            this.dataService.getDocumentNames().then(names => {
+                console.log("document names: %o", names);
+                this.availableDocuments = names;
+            }).catch(error => {
+                console.log("error: %o", error);
+            });
+        },
         write() {
             // should do an update
             this.dataService.update(this.documentName, {'tree': this.treeData}).then(response => {
@@ -141,7 +144,20 @@ export default Vue.extend({
     },
     watch: {
         documentName(newName, oldName): void {
-            this.loadData(newName);
+            console.log("available documents list is %o", this.availableDocuments);
+
+            if (includes(this.availableDocuments, newName)) {
+                this.loadData(newName);
+            } else {
+                this.treeData = [];
+
+                this.dataService.update(newName, {'tree': this.treeData}).then(response => {
+                    this.refreshAvailable();
+                    this.loadData(newName);
+                }).catch(error => {
+                    this.$message.error("update had error: " + error);
+                });
+            }
         }
     }
 });
