@@ -92,28 +92,17 @@ export default Vue.extend({
         }).catch(error => {
             console.log("error: %o", error);
         });
-        this.dataService.listAllDocuments();
-        
-        const loadingInstance = this.$loading({fullscreen: true});
-        
-        this.dataService.getLatestVersion(this.documentName).then(document => {
-            this.treeData = document.tree;
-            console.log("retrieved a document %o", document);
-            loadingInstance.close();
-        }).catch(error => {
-            this.$message.error("cannot read document " + error);
-            loadingInstance.close();
-        });
+
+        this.loadData(this.documentName);
         
         console.log("secret is %o", process.env.VUE_APP_SECRET);
-        
         
     },
     methods: {
         write() {
             // should do an update
             this.dataService.update(this.documentName, {'tree': this.treeData}).then(response => {
-                console.log("update worked");
+                this.$message("update worked");
             }).catch(error => {
                 console.log("update had error", error);
             });
@@ -137,9 +126,24 @@ export default Vue.extend({
         addChildCommand(node: any, data: any) {
             return makeNamedCommand('addChild', node, data);
         },
+        loadData(documentName: string): void {
+            const loadingInstance = this.$loading({fullscreen: true});
 
+            this.dataService.getLatestVersion(this.documentName).then(document => {
+                this.treeData = document.tree;
+                console.log("retrieved a document %o", document);
+                loadingInstance.close();
+            }).catch(error => {
+                this.$message.error("cannot read document " + error);
+                loadingInstance.close();
+            });
+
+        }
     },
-    computed: {
+    watch: {
+        documentName(newName, oldName): void {
+            this.loadData(newName);
+        }
     }
 });
 </script>
