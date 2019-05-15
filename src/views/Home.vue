@@ -111,13 +111,20 @@ export default Vue.extend({
 
         const documentName = "main0";
         const documentContent = {tree: []};
+
+        dataService.listAllDocuments();
         
         dataService.update(documentName, documentContent).then(response => {
             console.log("update worked");
         }).catch(error => {
             console.log("update had error", error);
         });
-        
+
+        dataService.getLatestVersion(documentName).then(document => {
+            console.log("retrieved a document %o", document);
+        }).catch(error => {
+            console.log("something bad happend: %o", error);
+        });
 
         console.log("secret is %o", process.env.VUE_APP_SECRET);
 

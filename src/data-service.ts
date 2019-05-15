@@ -44,4 +44,34 @@ export class DataService {
             }
         });
     }
+
+    listAllDocuments(): void {
+        this.db.allDocs().then(response => {
+            response.rows.forEach(x => {
+                console.log("row: %o", x);
+            });
+        });
+    }
+
+    getLatestVersion(documentName: string): Promise<Document> {
+        return new Promise((resolve, reject) => {
+            return this.db.allDocs().then(response => {
+                const filteredRows = response.rows.filter(
+                    row => row.id.startsWith(documentName + ":")
+                );
+
+                if (filteredRows.length === 0) {
+                    throw new Error("unable to find document");
+                }
+
+                const lastRow = filteredRows[filteredRows.length - 1];
+
+                return this.db.get(lastRow.id).then(response => {
+                    resolve(response);
+                });
+            }).catch(error => {
+                reject(error);
+            });
+        });
+    }
 }
