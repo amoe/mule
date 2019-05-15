@@ -35,7 +35,6 @@ import Promise from 'bluebird';
 import {ELEMENT_UI_DEMO_HIERARCHY} from '@/large-hierarchy';
 import {cloneDeep} from 'lodash';
 import {OptionsNode, Document, NodeCommand} from '@/types';
-import {DATABASE, USERNAME, PASSWORD} from '@/database-configuration';
 import {DataService} from '@/data-service';
 
 function makeSleep() {
@@ -70,18 +69,6 @@ function toCouch(treeData: any, documentName: string): any {
 }
     
     
-function getDatabase(): PouchDB.Database<Document> {
-    return new PouchDB<Document>(
-        DATABASE,
-        {
-            'auth': {
-                'username': USERNAME,
-                'password': PASSWORD
-            }
-        }
-    );
-}
-
 function makeNamedCommand(name: string, node: any, data: any): NodeCommand {
     return {
         command: name,
@@ -115,7 +102,6 @@ export default Vue.extend({
         return {
             documentName: 'main',
             treeData: [] as OptionsNode[],
-            couchdb: getDatabase()
         };
     },
     created() {
@@ -124,7 +110,7 @@ export default Vue.extend({
         console.log("data service is %o", dataService);
 
         const documentName = "main0";
-        const documentContent = {'meaningOfLife': 42};
+        const documentContent = {tree: []};
         
         dataService.update(documentName, documentContent).then(response => {
             console.log("update worked");
@@ -135,43 +121,18 @@ export default Vue.extend({
 
         console.log("secret is %o", process.env.VUE_APP_SECRET);
 
-        const loadingInstance = this.$loading({fullscreen: true});
+        // const loadingInstance = this.$loading({fullscreen: true});
 
-        this.couchdb.get(DOCUMENT_NAME).then(response => {
-            this.treeData = fromCouch(response);
-            loadingInstance.close();
-        }).catch (error => {
-            this.$message.error("cannot read document");
-            loadingInstance.close();
-        });
+        // this.couchdb.get(DOCUMENT_NAME).then(response => {
+        //     this.treeData = fromCouch(response);
+        //     loadingInstance.close();
+        // }).catch (error => {
+        //     this.$message.error("cannot read document");
+        //     loadingInstance.close();
+        // });
     },
     methods: {
         write() {
-            this.couchdb.put(this.couchTree).then(response => {
-                this.$message("put worked: " + response);
-            }).catch(error => {
-                
-                if (error.name === 'conflict') {
-                    console.log("conflict, attempting update");
-                    return this.couchdb.get(DOCUMENT_NAME).then(response => {
-                        this.couchdb.put(
-                            Object.assign(
-                                {},
-                                this.couchTree,
-                                {[REV_PROPERTY]: response._rev}
-                            )
-                        ).then(response => {
-                            this.$message("Updated successfully");
-                        }).catch(error => {
-                            this.$message.error("update failed");
-                        });
-                    }).catch (error => {
-                        this.$message.error("could not retrieve existent object");
-                    });
-                } else {
-                    this.$message.error("put failed: " + error);
-                }
-            });
         },
         handleNodeClick(node: OptionsNode) {
             //            node.label = "MERKED";
