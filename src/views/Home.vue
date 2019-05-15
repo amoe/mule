@@ -18,7 +18,6 @@
       </span>       
      </el-tree>
 
-
     <textarea cols="80" rows="25">
       {{treeData}}
     </textarea>
@@ -34,6 +33,7 @@ import Promise from 'bluebird';
 import {ELEMENT_UI_DEMO_HIERARCHY} from '@/large-hierarchy';
 import {cloneDeep} from 'lodash';
 import {OptionsNode, Document, NodeCommand} from '@/types';
+import {DATABASE, USERNAME, PASSWORD} from '@/database-configuration';
 
 function makeSleep() {
     return new Promise(resolve => setTimeout(resolve, 5000));
@@ -46,11 +46,11 @@ const REV_PROPERTY = '_rev';
 
 function getDatabase(): PouchDB.Database<Document> {
     return new PouchDB<Document>(
-        "http://localhost:5984/alice",
+        DATABASE,
         {
             'auth': {
-                'username': 'admin',
-                'password': 'admin'
+                'username': USERNAME,
+                'password': PASSWORD
             }
         }
     );
@@ -97,11 +97,7 @@ export default Vue.extend({
         this.couchdb.get(DOCUMENT_NAME).then(response => {
             delete response[ID_PROPERTY];
             delete response[REV_PROPERTY];
-//            this.jsonInput = JSON.stringify(response);
-
-
             this.treeData = response.tree;
-
             console.log("value is now %o", response);
             loadingInstance.close();
         }).catch (error => {
