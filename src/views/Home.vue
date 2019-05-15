@@ -1,5 +1,24 @@
 <template>
   <div class="home">
+     <el-tree :data="treeData"
+              v-on:node-click="handleNodeClick">
+      <span class="custom-tree-node" slot-scope="{ node, data }">
+        {{node.label}}
+        <el-dropdown trigger="hover" @command="handleCommand">
+          <span class="el-dropdown-link">
+            <i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item :command="deleteCommand(node, data)">Delete</el-dropdown-item>
+            <el-dropdown-item :command="addChildCommand(node, data)">Add child</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+        
+        </span>
+      </span>       
+     </el-tree>
+
+
     <textarea cols="80" rows="25" v-model="jsonInput">
     </textarea>
 
@@ -8,10 +27,11 @@
 </template>
 
 <script lang="ts">
-    import Vue from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+import Vue from 'vue';
 import PouchDB from 'pouchdb';
 import Promise from 'bluebird';
+import {ELEMENT_UI_DEMO_HIERARCHY} from '@/large-hierarchy';
+import {cloneDeep} from 'lodash';
 
 interface Document {
     meaningOfLife: number
@@ -42,12 +62,12 @@ function getDatabase(): PouchDB.Database<Document> {
     );
 }
 
-
 export default Vue.extend({
     name: 'home',
     data() {
         return {
             jsonInput: "",
+            treeData: cloneDeep(ELEMENT_UI_DEMO_HIERARCHY),
             couchdb: getDatabase()
         };
     },
