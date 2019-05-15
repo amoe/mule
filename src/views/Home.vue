@@ -1,5 +1,7 @@
 <template>
   <div class="home">
+    <el-input v-model="documentName"></el-input>
+    
      <el-tree :data="treeData"
               v-on:node-click="handleNodeClick">
       <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -27,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+    import Vue from 'vue';
 import PouchDB from 'pouchdb';
 import Promise from 'bluebird';
 import {ELEMENT_UI_DEMO_HIERARCHY} from '@/large-hierarchy';
@@ -39,11 +41,34 @@ function makeSleep() {
     return new Promise(resolve => setTimeout(resolve, 5000));
 }
 
-const DOCUMENT_NAME = 'main0';
+const DOCUMENT_NAME = 'main';
 const ID_PROPERTY = '_id';
 const REV_PROPERTY = '_rev';
 
 
+function getId(documentName: string): string {
+    if (documentName.includes(':')) {
+        throw new Error("bad documentname");
+    }
+
+    const timestamp: string = new Date().toISOString();
+    return documentName + ":" + timestamp;
+}
+
+function fromCouch(response: any): any {
+    return response.tree;
+}
+
+function toCouch(treeData: any, documentName: string): any {
+    const container = {
+        [ID_PROPERTY]: getId(documentName),
+        tree: treeData
+    };
+    
+    return container;
+}
+    
+    
 function getDatabase(): PouchDB.Database<Document> {
     return new PouchDB<Document>(
         DATABASE,
@@ -87,18 +112,18 @@ export default Vue.extend({
     name: 'home',
     data() {
         return {
+            documentName: 'main',
             treeData: [] as OptionsNode[],
             couchdb: getDatabase()
         };
     },
     created() {
+        console.log("secret is %o", process.env.VUE_APP_SECRET);
+
         const loadingInstance = this.$loading({fullscreen: true});
 
         this.couchdb.get(DOCUMENT_NAME).then(response => {
-            delete response[ID_PROPERTY];
-            delete response[REV_PROPERTY];
-            this.treeData = response.tree;
-            console.log("value is now %o", response);
+            this.treeData = fromCouch(response);
             loadingInstance.close();
         }).catch (error => {
             this.$message.error("cannot read document");
@@ -108,7 +133,7 @@ export default Vue.extend({
     methods: {
         write() {
             this.couchdb.put(this.couchTree).then(response => {
-                console.log("put worked, %o", response);
+                this.$message("put worked: " + response);
             }).catch(error => {
                 
                 if (error.name === 'conflict') {
@@ -156,12 +181,7 @@ export default Vue.extend({
     },
     computed: {
         couchTree(): any {
-            const container = {
-                [ID_PROPERTY]: DOCUMENT_NAME,
-                tree: cloneDeep(this.treeData)
-            };
-            
-            return container;
+            return toCouch(this.treeData, this.documentName);
         }
     }
 });
