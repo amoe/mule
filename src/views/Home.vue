@@ -39,7 +39,7 @@ function makeSleep() {
     return new Promise(resolve => setTimeout(resolve, 5000));
 }
 
-const DOCUMENT_NAME = 'main';
+const DOCUMENT_NAME = 'main0';
 const ID_PROPERTY = '_id';
 const REV_PROPERTY = '_rev';
 
@@ -110,6 +110,7 @@ export default Vue.extend({
             loadingInstance.close();
         }).catch (error => {
             this.$message.error("cannot read document");
+            loadingInstance.close();
         });
     },
     methods: {
