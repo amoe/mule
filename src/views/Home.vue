@@ -43,10 +43,6 @@ const DOCUMENT_NAME = 'main0';
 const ID_PROPERTY = '_id';
 const REV_PROPERTY = '_rev';
 
-const sampleDocument = {
-    "_id": DOCUMENT_NAME,
-    "meaningOfLife": 42
-};
 
 function getDatabase(): PouchDB.Database<Document> {
     return new PouchDB<Document>(
