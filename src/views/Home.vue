@@ -1,5 +1,7 @@
 <template>
   <div class="home">
+    <el-header>MULE</el-header>
+
     <el-select v-model="documentName"
                filterable
                allow-create>
@@ -28,9 +30,13 @@
       </span>       
      </el-tree>
 
-    <textarea cols="80" rows="25">
-      {{treeData}}
-    </textarea>
+    <el-button v-on:click="addRoot">Add root node</el-button>
+
+    <el-input type="textarea"
+              :value="prettyTree"
+              rows="8"
+              disabled="true">
+    </el-input>
 
     <el-button v-on:click="write">Write</el-button>
   </div>
@@ -158,6 +164,11 @@ export default Vue.extend({
                     this.$message.error("update had error: " + error);
                 });
             }
+        }
+    },
+    computed: {
+        prettyTree(): string {
+            return JSON.stringify(this.treeData, null, 4);
         }
     }
 });
