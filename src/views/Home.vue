@@ -36,6 +36,7 @@ import {ELEMENT_UI_DEMO_HIERARCHY} from '@/large-hierarchy';
 import {cloneDeep} from 'lodash';
 import {OptionsNode, Document, NodeCommand} from '@/types';
 import {DATABASE, USERNAME, PASSWORD} from '@/database-configuration';
+import {DataService} from '@/data-service';
 
 function makeSleep() {
     return new Promise(resolve => setTimeout(resolve, 5000));
@@ -118,6 +119,20 @@ export default Vue.extend({
         };
     },
     created() {
+        const dataService = new DataService();
+
+        console.log("data service is %o", dataService);
+
+        const documentName = "main0";
+        const documentContent = {'meaningOfLife': 42};
+        
+        dataService.update(documentName, documentContent).then(response => {
+            console.log("update worked");
+        }).catch(error => {
+            console.log("update had error", error);
+        });
+        
+
         console.log("secret is %o", process.env.VUE_APP_SECRET);
 
         const loadingInstance = this.$loading({fullscreen: true});
