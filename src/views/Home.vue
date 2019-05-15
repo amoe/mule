@@ -32,10 +32,7 @@ import PouchDB from 'pouchdb';
 import Promise from 'bluebird';
 import {ELEMENT_UI_DEMO_HIERARCHY} from '@/large-hierarchy';
 import {cloneDeep} from 'lodash';
-
-interface Document {
-    meaningOfLife: number
-};
+import {OptionsNode, Document, NodeCommand} from '@/types';
 
 function makeSleep() {
     return new Promise(resolve => setTimeout(resolve, 5000));
@@ -61,6 +58,33 @@ function getDatabase(): PouchDB.Database<Document> {
         }
     );
 }
+
+function makeNamedCommand(name: string, node: any, data: any): NodeCommand {
+    return {
+        command: name,
+        node,
+        data
+    }
+}
+
+// this function is taken from the element UI demo.
+function removeDestructive(node: any, data: any) {
+    const parent = node.parent;
+    const children = parent.data.children || parent.data;
+    const index = children.findIndex((d: any) => d.id === data.id);
+    children.splice(index, 1);
+}
+
+
+function appendDestructive(data: any) {
+    // Setup reactive child array if not already there
+    if (!data.children) {
+        Vue.set(data, 'children', []);
+    }
+    
+    data.children.push({value: "foo", label: "blah"})
+}
+
 
 export default Vue.extend({
     name: 'home',
@@ -109,6 +133,26 @@ export default Vue.extend({
                 }
             });
         },
+        handleNodeClick(node: OptionsNode) {
+            //            node.label = "MERKED";
+        },
+        handleCommand(commandObject: NodeCommand) {
+            console.log("command is %o", commandObject.command);
+            
+            if (commandObject.command === 'delete') {
+                console.log("value of data is %o", commandObject.data);
+                removeDestructive(commandObject.node, commandObject.data);
+            } else if (commandObject.command === 'addChild') {
+                appendDestructive(commandObject.data);
+            }
+        },
+        deleteCommand(node: any, data: any) {
+            return makeNamedCommand('delete', node, data);
+        },
+        addChildCommand(node: any, data: any) {
+            return makeNamedCommand('addChild', node, data);
+        },
+
     },
     computed: {
         currentDocument(): any {
