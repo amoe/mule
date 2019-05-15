@@ -1,6 +1,12 @@
 <template>
   <div class="home">
-    <el-input v-model="documentName"></el-input>
+    <el-select v-model="documentName">
+      <el-option v-for="item in availableDocuments"
+                 :key="item"
+                 :label="item"
+                 :value="item">
+      </el-option>
+    </el-select>
     
      <el-tree :data="treeData"
               v-on:node-click="handleNodeClick">
@@ -73,6 +79,7 @@ export default Vue.extend({
     data() {
         return {
             documentName: 'main',
+            availableDocuments: [] as string[],
             treeData: [] as OptionsNode[],
             dataService: new DataService()
         };
@@ -81,6 +88,7 @@ export default Vue.extend({
         console.log("data service is %o", this.dataService);
         this.dataService.getDocumentNames().then(names => {
             console.log("document names: %o", names);
+            this.availableDocuments = names;
         }).catch(error => {
             console.log("error: %o", error);
         });
