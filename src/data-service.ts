@@ -1,7 +1,7 @@
 import PouchDB from 'pouchdb';
 import { DATABASE, USERNAME, PASSWORD } from '@/database-configuration';
 import { Document } from '@/types';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, uniq } from 'lodash';
 
 type PDBCR = PouchDB.Core.Response;
 
@@ -15,6 +15,10 @@ function getId(documentName: string): string {
 
     const timestamp: string = new Date().toISOString();
     return documentName + ":" + timestamp;
+}
+
+function getDocumentNameFromId(id: string): string {
+    return id.replace(/:.*/, "");
 }
 
 
@@ -31,6 +35,17 @@ export class DataService {
                 }
             }
         );
+    }
+
+    getDocumentNames(): Promise<string[]> {
+        return new Promise((resolve, reject) => {
+            return this.db.allDocs().then(response => {
+                const result = uniq(
+                    response.rows.map(row => getDocumentNameFromId(row.id))
+                );
+                resolve(result);
+            });
+        });
     }
 
     // should return response

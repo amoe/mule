@@ -78,8 +78,12 @@ export default Vue.extend({
         };
     },
     created() {
-        
         console.log("data service is %o", this.dataService);
+        this.dataService.getDocumentNames().then(names => {
+            console.log("document names: %o", names);
+        }).catch(error => {
+            console.log("error: %o", error);
+        });
         this.dataService.listAllDocuments();
         
         const loadingInstance = this.$loading({fullscreen: true});
