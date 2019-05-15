@@ -86,6 +86,7 @@ export default Vue.extend({
     },
     created() {
         console.log("data service is %o", this.dataService);
+
         this.dataService.getDocumentNames().then(names => {
             console.log("document names: %o", names);
             this.availableDocuments = names;
@@ -94,9 +95,6 @@ export default Vue.extend({
         });
 
         this.loadData(this.documentName);
-        
-        console.log("secret is %o", process.env.VUE_APP_SECRET);
-        
     },
     methods: {
         write() {
