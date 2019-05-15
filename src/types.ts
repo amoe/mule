@@ -5,7 +5,7 @@ export interface OptionsNode {
 }
 
 export interface Document {
-    meaningOfLife: number
+    tree: OptionsNode[]
 };
 
 export interface NodeCommand {

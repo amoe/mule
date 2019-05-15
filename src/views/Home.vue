@@ -19,7 +19,8 @@
      </el-tree>
 
 
-    <textarea cols="80" rows="25" v-model="jsonInput">
+    <textarea cols="80" rows="25">
+      {{treeData}}
     </textarea>
 
     <button v-on:click="write">Write</button>
@@ -90,28 +91,32 @@ export default Vue.extend({
     name: 'home',
     data() {
         return {
-            jsonInput: "",
-            treeData: cloneDeep(ELEMENT_UI_DEMO_HIERARCHY),
+            treeData: [] as OptionsNode[],
             couchdb: getDatabase()
         };
     },
     created() {
+        const loadingInstance = this.$loading({fullscreen: true});
+
         this.couchdb.get(DOCUMENT_NAME).then(response => {
             delete response[ID_PROPERTY];
             delete response[REV_PROPERTY];
-            this.jsonInput = JSON.stringify(response);
+//            this.jsonInput = JSON.stringify(response);
+
+
+            this.treeData = response.tree;
+
+            console.log("value is now %o", response);
+            loadingInstance.close();
         }).catch (error => {
-            console.log("cannot read document");
+            this.$message.error("cannot read document");
         });
     },
     methods: {
         write() {
-            console.log("I would write");
-            
-            this.couchdb.put(this.currentDocument).then(response => {
+            this.couchdb.put(this.couchTree).then(response => {
                 console.log("put worked, %o", response);
             }).catch(error => {
-                console.log("put failed, %o", error);
                 
                 if (error.name === 'conflict') {
                     console.log("conflict, attempting update");
@@ -119,17 +124,19 @@ export default Vue.extend({
                         this.couchdb.put(
                             Object.assign(
                                 {},
-                                this.currentDocument,
+                                this.couchTree,
                                 {[REV_PROPERTY]: response._rev}
                             )
                         ).then(response => {
-                            console.log("updated successfully");
+                            this.$message("Updated successfully");
                         }).catch(error => {
-                            console.log("update failed");
+                            this.$message.error("update failed");
                         });
                     }).catch (error => {
-                        console.log("could not retrieve existent object");
+                        this.$message.error("could not retrieve existent object");
                     });
+                } else {
+                    this.$message.error("put failed: " + error);
                 }
             });
         },
@@ -155,10 +162,13 @@ export default Vue.extend({
 
     },
     computed: {
-        currentDocument(): any {
-            const deserialized = JSON.parse(this.jsonInput);
-            deserialized[ID_PROPERTY] = DOCUMENT_NAME;
-            return deserialized;
+        couchTree(): any {
+            const container = {
+                [ID_PROPERTY]: DOCUMENT_NAME,
+                tree: cloneDeep(this.treeData)
+            };
+            
+            return container;
         }
     }
 });
