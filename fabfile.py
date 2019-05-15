@@ -1,10 +1,11 @@
 import fabric
 import patchwork.transfers
 
-c = fabric.Connection('visarend.solasistim.net')
-c.run('/bin/true')
 
-print(patchwork.transfers.rsync)
+
+c = fabric.Connection('visarend.solasistim.net')
+c.run("/bin/true")
+c.local("/usr/bin/npm run build", replace_env=False)
 
 # Trailing slash needed
 source = 'dist/'
