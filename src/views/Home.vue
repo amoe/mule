@@ -1,24 +1,47 @@
 <template>
-  <div class="home">
-    <el-header>MULE</el-header>
-
-    <el-select v-model="documentName"
-               filterable
-               allow-create>
-      <el-option v-for="item in availableDocuments"
-                 :key="item"
-                 :label="item"
-                 :value="item">
-      </el-option>
-    </el-select>
+<div class="home">
+  <el-container>
+    <el-header>
+      MULE
+      
+      <el-dialog title="Help"
+                 :visible.sync="dialogVisible"
+                 width="30%">
+        <help></help>
+        
+        <span slot="footer" class="dialog-footer">
+          <el-button v-on:click="dialogVisible = false">OK</el-button>
+        </span>
+      </el-dialog>
+      
+      <el-button v-on:click="dialogVisible = true">Help</el-button>
+    </el-header>
     
-     <el-tree :data="treeData"
-              v-on:node-click="handleNodeClick">
+    <el-main>
+      <span>Document name: </span>
+      <el-select v-model="documentName"
+                 filterable
+                 allow-create>
+        <el-option v-for="item in availableDocuments"
+                   :key="item"
+                   :label="item"
+                   :value="item">
+        </el-option>
+      </el-select>
+
+      <el-tree :data="treeData"
+               id="tree-editor"
+               v-on:node-click="handleNodeClick">
       <span class="custom-tree-node" slot-scope="{ node, data }">
-
         <span>{{node.label}}</span>
-        <span>{{node.linkedAnnotation}}</span>
 
+        <span v-if="node.data.linkedAnnotation"
+              class="active-annotation"
+              v-on:click="setAnnotation(node)">{{node.data.linkedAnnotation}}</span>
+        <span v-else
+              class="inactive-annotation"
+              v-on:click="setAnnotation(node)">no annotation</span>
+        
         <el-dropdown trigger="hover" @command="handleCommand">
           <span class="el-dropdown-link">
             <i class="el-icon-arrow-down el-icon--right"></i>
@@ -26,6 +49,7 @@
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item :command="deleteCommand(node, data)">Delete</el-dropdown-item>
             <el-dropdown-item :command="addChildCommand(node, data)">Add child</el-dropdown-item>
+            <el-dropdown-item :command="unlinkCommand(node, data)">Unlink</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
         
@@ -42,18 +66,21 @@
     </el-input>
 
     <el-button v-on:click="write">Save</el-button>
+    </el-main>
+    </el-container>
   </div>
 </template>
 
 <script lang="ts">
-    import Vue from 'vue';
+import Vue from 'vue';
 import PouchDB from 'pouchdb';
 import Promise from 'bluebird';
 import {ELEMENT_UI_DEMO_HIERARCHY} from '@/large-hierarchy';
 import {cloneDeep, includes} from 'lodash';
-import {OptionsNode, Document, NodeCommand} from '@/types';
+import {AugmentedNode, OptionsNode, Document, NodeCommand} from '@/types';
 import {DataService} from '@/data-service';
 import {isMessageBoxInputData} from '@/type-guards';
+import Help from '@/components/Help.vue';
 
 function makeSleep() {
     return new Promise(resolve => setTimeout(resolve, 5000));
@@ -91,12 +118,14 @@ function appendDestructive(data: OptionsNode, newNode: OptionsNode) {
 
 export default Vue.extend({
     name: 'home',
+    components: {Help},
     data() {
         return {
             documentName: 'main',
             availableDocuments: [] as string[],
             treeData: [] as OptionsNode[],
             dataService: new DataService(),
+            dialogVisible: false,
         };
     },
     created() {
@@ -151,6 +180,8 @@ export default Vue.extend({
                 }).catch(error => {
                     console.log("error is %o", error);
                 });
+            } else if (commandObject.command === 'unlink') {
+                commandObject.data.linkedAnnotation = null;
             }
         },
         deleteCommand(node: any, data: any) {
@@ -158,6 +189,9 @@ export default Vue.extend({
         },
         addChildCommand(node: any, data: any) {
             return makeNamedCommand('addChild', node, data);
+        },
+        unlinkCommand(node: any, data: any) {
+            return makeNamedCommand('unlink', node, data);
         },
         loadData(documentName: string): void {
             const loadingInstance = this.$loading({fullscreen: true});
@@ -197,6 +231,27 @@ export default Vue.extend({
                 console.log("error is %o", error);
             });
         },
+        spy(value: any): string {
+            console.log("value is %o", value);
+            return "PLACEHOLDER";
+        },
+        setAnnotation(node: AugmentedNode) {
+            console.log("I would set annotation for %o", node);
+
+            const message = "What should the annotation link be?";
+            const title = "Set linked annotation";
+            const options = {};
+            
+            this.$prompt(message, title, options).then(data => {
+                if (isMessageBoxInputData(data)) {
+                    const inputValue = data.value;
+                    node.data.linkedAnnotation = inputValue;
+                }
+            }).catch(error => {
+                console.log("error is %o", error);
+            });
+
+        }
     },
     watch: {
         documentName(newName, oldName): void {
@@ -223,3 +278,21 @@ export default Vue.extend({
     }
 });
 </script>
+
+<style lang="less">
+.active-annotation {
+     background-color: red;
+     margin-left: 2em;
+     font-family: monospace;
+}
+
+.inactive-annotation {
+     background-color: grey;
+     margin-left: 2em;
+     font-family: monospace;
+}
+
+#tree-editor {
+     background-color: grey;
+}
+</style>

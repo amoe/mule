@@ -1,3 +1,7 @@
+import { TreeNode } from 'element-ui/types/tree';
+
+export type AugmentedNode = TreeNode<string, OptionsNode>
+
 export interface OptionsNode {
     value: string;
     label: string;
