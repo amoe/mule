@@ -280,6 +280,8 @@ export default Vue.extend({
 </script>
 
 <style lang="less">
+// FIX THESE COLOURS from the element colour stuff
+
 .active-annotation {
      background-color: red;
      margin-left: 2em;
@@ -293,6 +295,6 @@ export default Vue.extend({
 }
 
 #tree-editor {
-     background-color: grey;
+     background-color: white;
 }
 </style>
