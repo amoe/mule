@@ -35,18 +35,6 @@
 
     <el-button v-on:click="addRoot">Add root node</el-button>
 
-
-    <el-dialog :visible.sync="dialogVisible">
-      <span>What should the node be called?</span>
-
-      <el-input v-model="dialogContext.newNodeName"></el-input>
-
-      <span slot="footer" class="dialog-footer">
-        <el-button v-on:click="dismiss">Cancel</el-button>
-        <el-button type="primary" v-on:click="confirm">Confirm</el-button>
-      </span>
-    </el-dialog>
-
     <el-input type="textarea"
               :value="prettyTree"
               rows="8"
@@ -65,6 +53,7 @@ import {ELEMENT_UI_DEMO_HIERARCHY} from '@/large-hierarchy';
 import {cloneDeep, includes} from 'lodash';
 import {OptionsNode, Document, NodeCommand} from '@/types';
 import {DataService} from '@/data-service';
+import {isMessageBoxInputData} from '@/type-guards';
 
 function makeSleep() {
     return new Promise(resolve => setTimeout(resolve, 5000));
@@ -92,10 +81,10 @@ function appendDestructive(data: OptionsNode, newNode: OptionsNode) {
     if (!data.children) {
         Vue.set(data, 'children', []);
     }
-
+    
     // Shut tsc up.
     if (data.children === undefined) throw new Error("can't happen");
-
+    
     data.children.push(newNode);
 }
 
@@ -108,16 +97,11 @@ export default Vue.extend({
             availableDocuments: [] as string[],
             treeData: [] as OptionsNode[],
             dataService: new DataService(),
-            dialogVisible: false,
-            dialogContext: {
-                newNodeName: "",
-                parentNode: null as (OptionsNode | null)
-            }
         };
     },
     created() {
         console.log("data service is %o", this.dataService);
-
+        
         this.refreshAvailable();
         this.loadData(this.documentName);
     },
@@ -159,7 +143,7 @@ export default Vue.extend({
         },
         loadData(documentName: string): void {
             const loadingInstance = this.$loading({fullscreen: true});
-
+            
             this.dataService.getLatestVersion(this.documentName).then(document => {
                 this.treeData = document.tree;
                 console.log("retrieved a document %o", document);
@@ -167,38 +151,34 @@ export default Vue.extend({
             }).catch(error => {
                 this.$message.error("Cannot read document '" + documentName + "': " + error.message);
                 this.treeData = [];
-
+                
                 loadingInstance.close();
             });
-
+            
         },
         addRoot(): void {
-            this.dialogVisible = true;
+            const message = "What should the name of the node be?";
+            const title = "Add root node";
+            const options = {};
+            
+            this.$prompt(message, title, options).then(data => {
+                if (isMessageBoxInputData(data)) {
+                    const inputValue = data.value;
+                    
+                    console.log("data is %o", data);
+                    
+                    const newNode: OptionsNode = {
+                        value: inputValue,
+                        label: inputValue,
+                        linkedAnnotation: null
+                    };
+
+                    this.treeData.push(newNode);
+                }
+            }).catch(error => {
+                console.log("error is %o", error);
+            });
         },
-        confirm(): void {
-            this.dialogVisible = false;
-
-            const p = this.dialogContext.parentNode;
-
-            const newNode: OptionsNode = {
-                value: this.dialogContext.newNodeName,
-                label: this.dialogContext.newNodeName,
-                linkedAnnotation: null
-            };
-
-            if (p === null) {
-                this.treeData.push(newNode)
-            } else {
-                appendDestructive(p, newNode);
-            }
-
-            // reset the dialog context
-            this.dialogContext.newNodeName = "";
-            this.dialogContext.parentNode = null;
-        },
-        dismiss(): void {
-            this.dialogVisible = false;
-        }
     },
     watch: {
         documentName(newName, oldName): void {
