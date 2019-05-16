@@ -41,7 +41,7 @@
               disabled>
     </el-input>
 
-    <el-button v-on:click="write">Write</el-button>
+    <el-button v-on:click="write">Save</el-button>
   </div>
 </template>
 
@@ -117,7 +117,7 @@ export default Vue.extend({
         write() {
             // should do an update
             this.dataService.update(this.documentName, {'tree': this.treeData}).then(response => {
-                this.$message("update worked");
+                this.$message("Saved latest revision.");
             }).catch(error => {
                 this.$message.error("update had error: " + error);
             });
@@ -132,7 +132,25 @@ export default Vue.extend({
                 console.log("value of data is %o", commandObject.data);
                 removeDestructive(commandObject.node, commandObject.data);
             } else if (commandObject.command === 'addChild') {
-                appendDestructive(commandObject.data, {value: "foo", label: "blah", linkedAnnotation: null});
+                const message = "What should the name of the leaf node be?";
+                const title = "Add node";
+                const options = {};
+
+                this.$prompt(message, title, options).then(data => {
+                    if (isMessageBoxInputData(data)) {
+                        const inputValue = data.value;
+
+                        const newNode: OptionsNode = {
+                            value: inputValue,
+                            label: inputValue,
+                            linkedAnnotation: null
+                        };
+
+                        appendDestructive(commandObject.data, newNode);
+                    }
+                }).catch(error => {
+                    console.log("error is %o", error);
+                });
             }
         },
         deleteCommand(node: any, data: any) {
