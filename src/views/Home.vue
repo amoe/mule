@@ -32,10 +32,21 @@
 
     <el-button v-on:click="addRoot">Add root node</el-button>
 
+
+    <el-dialog title="Tips"
+               :visible.sync="dialogVisible"
+               width="30%">
+      <span>This is a message</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
+      </span>
+    </el-dialog>
+
     <el-input type="textarea"
               :value="prettyTree"
               rows="8"
-              disabled="true">
+              disabled>
     </el-input>
 
     <el-button v-on:click="write">Write</el-button>
@@ -89,7 +100,8 @@ export default Vue.extend({
             documentName: 'main',
             availableDocuments: [] as string[],
             treeData: [] as OptionsNode[],
-            dataService: new DataService()
+            dataService: new DataService(),
+            dialogVisible: false
         };
     },
     created() {
@@ -146,6 +158,9 @@ export default Vue.extend({
                 loadingInstance.close();
             });
 
+        },
+        addRoot(): void {
+            this.dialogVisible = true;
         }
     },
     watch: {
