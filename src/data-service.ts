@@ -87,7 +87,7 @@ export class DataService {
                 );
 
                 if (filteredRows.length === 0) {
-                    throw new Error("unable to find document");
+                    throw new Error("no such document");
                 }
 
                 const lastRow = filteredRows[filteredRows.length - 1];

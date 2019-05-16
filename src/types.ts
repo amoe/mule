@@ -1,6 +1,7 @@
 export interface OptionsNode {
     value: string;
     label: string;
+    linkedAnnotation: string | null;
     children?: OptionsNode[]
 }
 

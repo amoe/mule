@@ -15,7 +15,10 @@
      <el-tree :data="treeData"
               v-on:node-click="handleNodeClick">
       <span class="custom-tree-node" slot-scope="{ node, data }">
-        {{node.label}}
+
+        <span>{{node.label}}</span>
+        <span>{{node.linkedAnnotation}}</span>
+
         <el-dropdown trigger="hover" @command="handleCommand">
           <span class="el-dropdown-link">
             <i class="el-icon-arrow-down el-icon--right"></i>
@@ -157,7 +160,7 @@ export default Vue.extend({
                 console.log("retrieved a document %o", document);
                 loadingInstance.close();
             }).catch(error => {
-                this.$message.error("cannot read document " + error);
+                this.$message.error("Cannot read document '" + documentName + "': " + error.message);
                 loadingInstance.close();
             });
 
@@ -167,7 +170,7 @@ export default Vue.extend({
         },
         confirm(): void {
             this.dialogVisible = false;
-            this.treeData.push({value: this.newNodeName, label: this.newNodeName})
+            this.treeData.push({value: this.newNodeName, label: this.newNodeName, linkedAnnotation: null})
             this.newNodeName = "";
         },
         dismiss(): void {

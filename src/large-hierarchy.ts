@@ -3,195 +3,256 @@ import { OptionsNode } from '@/types';
 export const ELEMENT_UI_DEMO_HIERARCHY: OptionsNode[] = [{
     value: 'guide',
     label: 'Guide',
+    linkedAnnotation: null,
     children: [{
         value: 'disciplines',
         label: 'Disciplines',
+        linkedAnnotation: null,
         children: [{
             value: 'consistency',
-            label: 'Consistency'
+            label: 'Consistency',
+            linkedAnnotation: null,
         }, {
             value: 'feedback',
-            label: 'Feedback'
+            label: 'Feedback',
+            linkedAnnotation: null,
         }, {
             value: 'efficiency',
-            label: 'Efficiency'
+            label: 'Efficiency',
+            linkedAnnotation: null,
         }, {
             value: 'controllability',
-            label: 'Controllability'
+            label: 'Controllability',
+            linkedAnnotation: null,
         }]
     }, {
         value: 'navigation',
+        linkedAnnotation: null,
         label: 'Navigation',
         children: [{
             value: 'side nav',
-            label: 'Side Navigation'
+            label: 'Side Navigation',
+            linkedAnnotation: null,
         }, {
             value: 'top nav',
-            label: 'Top Navigation'
+            label: 'Top Navigation',
+            linkedAnnotation: null,
         }]
     }]
 }, {
     value: 'component',
     label: 'Component',
+    linkedAnnotation: null,
     children: [{
         value: 'basic',
         label: 'Basic',
+        linkedAnnotation: null,
         children: [{
             value: 'layout',
-            label: 'Layout'
+            label: 'Layout',
+            linkedAnnotation: null,
         }, {
             value: 'color',
-            label: 'Color'
+            label: 'Color',
+            linkedAnnotation: null,
         }, {
             value: 'typography',
-            label: 'Typography'
+            label: 'Typography',
+            linkedAnnotation: null,
         }, {
             value: 'icon',
-            label: 'Icon'
+            label: 'Icon',
+            linkedAnnotation: null,
         }, {
             value: 'button',
-            label: 'Button'
+            label: 'Button',
+            linkedAnnotation: null,
         }]
     }, {
         value: 'form',
         label: 'Form',
+        linkedAnnotation: null,
         children: [{
             value: 'radio',
-            label: 'Radio'
+            label: 'Radio',
+            linkedAnnotation: null,
         }, {
             value: 'checkbox',
-            label: 'Checkbox'
+            label: 'Checkbox',
+            linkedAnnotation: null,
         }, {
             value: 'input',
-            label: 'Input'
+            label: 'Input',
+            linkedAnnotation: null,
         }, {
             value: 'input-number',
-            label: 'InputNumber'
+            label: 'InputNumber',
+            linkedAnnotation: null,
         }, {
             value: 'select',
-            label: 'Select'
+            label: 'Select',
+            linkedAnnotation: null,
         }, {
             value: 'cascader',
-            label: 'Cascader'
+            label: 'Cascader',
+            linkedAnnotation: null,
         }, {
             value: 'switch',
-            label: 'Switch'
+            label: 'Switch',
+            linkedAnnotation: null,
         }, {
             value: 'slider',
-            label: 'Slider'
+            label: 'Slider',
+            linkedAnnotation: null,
         }, {
             value: 'time-picker',
-            label: 'TimePicker'
+            label: 'TimePicker',
+            linkedAnnotation: null,
         }, {
             value: 'date-picker',
-            label: 'DatePicker'
+            label: 'DatePicker',
+            linkedAnnotation: null,
         }, {
             value: 'datetime-picker',
-            label: 'DateTimePicker'
+            label: 'DateTimePicker',
+            linkedAnnotation: null,
         }, {
             value: 'upload',
-            label: 'Upload'
+            label: 'Upload',
+            linkedAnnotation: null,
         }, {
             value: 'rate',
-            label: 'Rate'
+            label: 'Rate',
+            linkedAnnotation: null,
         }, {
             value: 'form',
-            label: 'Form'
+            label: 'Form',
+            linkedAnnotation: null,
         }]
     }, {
         value: 'data',
         label: 'Data',
+        linkedAnnotation: null,
         children: [{
             value: 'table',
-            label: 'Table'
+            label: 'Table',
+            linkedAnnotation: null,
         }, {
             value: 'tag',
-            label: 'Tag'
+            label: 'Tag',
+            linkedAnnotation: null,
         }, {
             value: 'progress',
-            label: 'Progress'
+            label: 'Progress',
+            linkedAnnotation: null,
         }, {
             value: 'tree',
-            label: 'Tree'
+            label: 'Tree',
+            linkedAnnotation: null,
         }, {
             value: 'pagination',
-            label: 'Pagination'
+            label: 'Pagination',
+            linkedAnnotation: null,
         }, {
             value: 'badge',
-            label: 'Badge'
+            label: 'Badge',
+            linkedAnnotation: null,
         }]
     }, {
         value: 'notice',
         label: 'Notice',
+        linkedAnnotation: null,
         children: [{
             value: 'alert',
-            label: 'Alert'
+            label: 'Alert',
+            linkedAnnotation: null,
         }, {
             value: 'loading',
-            label: 'Loading'
+            label: 'Loading',
+            linkedAnnotation: null,
         }, {
             value: 'message',
-            label: 'Message'
+            label: 'Message',
+            linkedAnnotation: null,
         }, {
             value: 'message-box',
-            label: 'MessageBox'
+            label: 'MessageBox',
+            linkedAnnotation: null,
         }, {
             value: 'notification',
-            label: 'Notification'
+            label: 'Notification',
+            linkedAnnotation: null,
         }]
     }, {
         value: 'navigation',
         label: 'Navigation',
+        linkedAnnotation: null,
         children: [{
             value: 'menu',
-            label: 'NavMenu'
+            label: 'NavMenu',
+            linkedAnnotation: null,
         }, {
             value: 'tabs',
-            label: 'Tabs'
+            label: 'Tabs',
+            linkedAnnotation: null,
         }, {
             value: 'breadcrumb',
-            label: 'Breadcrumb'
+            label: 'Breadcrumb',
+            linkedAnnotation: null,
         }, {
             value: 'dropdown',
-            label: 'Dropdown'
+            label: 'Dropdown',
+            linkedAnnotation: null,
         }, {
             value: 'steps',
-            label: 'Steps'
+            label: 'Steps',
+            linkedAnnotation: null,
         }]
     }, {
         value: 'others',
         label: 'Others',
+        linkedAnnotation: null,
         children: [{
             value: 'dialog',
-            label: 'Dialog'
+            label: 'Dialog',
+            linkedAnnotation: null,
         }, {
             value: 'tooltip',
-            label: 'Tooltip'
+            label: 'Tooltip',
+            linkedAnnotation: null,
         }, {
             value: 'popover',
-            label: 'Popover'
+            label: 'Popover',
+            linkedAnnotation: null,
         }, {
             value: 'card',
-            label: 'Card'
+            label: 'Card',
+            linkedAnnotation: null,
         }, {
             value: 'carousel',
-            label: 'Carousel'
+            label: 'Carousel',
+            linkedAnnotation: null,
         }, {
             value: 'collapse',
-            label: 'Collapse'
+            label: 'Collapse',
+            linkedAnnotation: null,
         }]
     }]
 }, {
     value: 'resource',
     label: 'Resource',
+    linkedAnnotation: null,
     children: [{
         value: 'axure',
-        label: 'Axure Components'
+        label: 'Axure Components',
+        linkedAnnotation: null,
     }, {
         value: 'sketch',
-        label: 'Sketch Templates'
+        label: 'Sketch Templates',
+        linkedAnnotation: null,
     }, {
         value: 'docs',
-        label: 'Design Documentation'
+        label: 'Design Documentation',
+        linkedAnnotation: null,
     }]
 }];
