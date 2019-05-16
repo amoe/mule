@@ -39,8 +39,7 @@
     <el-dialog :visible.sync="dialogVisible">
       <span>What should the node be called?</span>
 
-
-      <el-input v-model="newNodeName"></el-input>
+      <el-input v-model="dialogContext.newNodeName"></el-input>
 
       <span slot="footer" class="dialog-footer">
         <el-button v-on:click="dismiss">Cancel</el-button>
@@ -88,13 +87,16 @@ function removeDestructive(node: any, data: any) {
 }
 
 
-function appendDestructive(data: any) {
+function appendDestructive(data: OptionsNode, newNode: OptionsNode) {
     // Setup reactive child array if not already there
     if (!data.children) {
         Vue.set(data, 'children', []);
     }
-    
-    data.children.push({value: "foo", label: "blah"})
+
+    // Shut tsc up.
+    if (data.children === undefined) throw new Error("can't happen");
+
+    data.children.push(newNode);
 }
 
 
@@ -107,7 +109,10 @@ export default Vue.extend({
             treeData: [] as OptionsNode[],
             dataService: new DataService(),
             dialogVisible: false,
-            newNodeName: ""
+            dialogContext: {
+                newNodeName: "",
+                parentNode: null as (OptionsNode | null)
+            }
         };
     },
     created() {
@@ -143,7 +148,7 @@ export default Vue.extend({
                 console.log("value of data is %o", commandObject.data);
                 removeDestructive(commandObject.node, commandObject.data);
             } else if (commandObject.command === 'addChild') {
-                appendDestructive(commandObject.data);
+                appendDestructive(commandObject.data, {value: "foo", label: "blah", linkedAnnotation: null});
             }
         },
         deleteCommand(node: any, data: any) {
@@ -161,6 +166,8 @@ export default Vue.extend({
                 loadingInstance.close();
             }).catch(error => {
                 this.$message.error("Cannot read document '" + documentName + "': " + error.message);
+                this.treeData = [];
+
                 loadingInstance.close();
             });
 
@@ -170,8 +177,24 @@ export default Vue.extend({
         },
         confirm(): void {
             this.dialogVisible = false;
-            this.treeData.push({value: this.newNodeName, label: this.newNodeName, linkedAnnotation: null})
-            this.newNodeName = "";
+
+            const p = this.dialogContext.parentNode;
+
+            const newNode: OptionsNode = {
+                value: this.dialogContext.newNodeName,
+                label: this.dialogContext.newNodeName,
+                linkedAnnotation: null
+            };
+
+            if (p === null) {
+                this.treeData.push(newNode)
+            } else {
+                appendDestructive(p, newNode);
+            }
+
+            // reset the dialog context
+            this.dialogContext.newNodeName = "";
+            this.dialogContext.parentNode = null;
         },
         dismiss(): void {
             this.dialogVisible = false;
