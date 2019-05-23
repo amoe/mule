@@ -31,7 +31,8 @@
 
       <el-tree :data="treeData"
                id="tree-editor"
-               v-on:node-click="handleNodeClick">
+               v-on:node-click="handleNodeClick"
+               draggable>
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{node.label}}</span>
 
@@ -68,6 +69,7 @@
 
     <el-button v-on:click="write">Save</el-button>
     <el-button v-on:click="loadDemoHierarchy">Load demo hierarchy</el-button>
+    <el-button v-on:click="loadData">Revert</el-button>
     </el-main>
     </el-container>
   </div>
