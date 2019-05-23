@@ -1,7 +1,6 @@
 <template>
 <div class="help">
   <h2>Create a new taxonomy</h2>
-
   <p>
     The document selector can be used to create a new taxonomy.  When you start
     typing into this selector, a box will appear underneath it.  Click on the 
@@ -37,11 +36,15 @@
     Again, use the menu, and click 'Unlink'.  This will remove its annotation.
   </p>
 
-  <h2>Caveats</h2>
+  <h2>Move node</h2>
+  <p>Drag a node to move it.  Moving a node will also move all of its child nodes.</p>
 
+  <h2>Revert local changes</h2>
+  <p>Press 'revert' to go back to the version stored on the server.</p>
+
+  <h2>Caveats</h2>
   <p>Node names should be unique at the moment.</p>
   <p>Annotation names are stored as plain strings.  There's no linkage between them.</p>
-  <p>There's no way to change the parent node of a node or subtree (i.e. move it).</p>
 </div>
 </template>
 
