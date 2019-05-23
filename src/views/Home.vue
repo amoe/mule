@@ -1,8 +1,8 @@
 <template>
 <div class="home">
   <el-container>
-    <el-header>
-      MULE
+    <el-header height="96px">
+      <h1>MULE</h1>
       
       <el-dialog title="Help"
                  :visible.sync="dialogVisible"
@@ -13,7 +13,7 @@
           <el-button v-on:click="dialogVisible = false">OK</el-button>
         </span>
       </el-dialog>
-      
+
       <el-button v-on:click="dialogVisible = true">Help</el-button>
     </el-header>
     
