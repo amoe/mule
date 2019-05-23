@@ -26,6 +26,7 @@ export class DataService {
     db: PouchDB.Database<Document>;
 
     constructor() {
+        console.log("connecting to server %o", DATABASE);
         this.db = new PouchDB<Document>(
             DATABASE,
             {

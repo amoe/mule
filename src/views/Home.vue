@@ -37,12 +37,13 @@
 
         <span v-if="node.data.linkedAnnotation"
               class="active-annotation"
-              v-on:click="setAnnotation(node)">{{node.data.linkedAnnotation}}</span>
+              v-on:click.stop="setAnnotation(node)">{{node.data.linkedAnnotation}}</span>
         <span v-else
               class="inactive-annotation"
-              v-on:click="setAnnotation(node)">no annotation</span>
+              v-on:click.stop="setAnnotation(node)">no annotation</span>
         
-        <el-dropdown trigger="hover" @command="handleCommand">
+        <el-dropdown trigger="hover" 
+                     v-on:command="handleCommand">
           <span class="el-dropdown-link">
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
@@ -66,6 +67,7 @@
     </el-input>
 
     <el-button v-on:click="write">Save</el-button>
+    <el-button v-on:click="loadDemoHierarchy">Load demo hierarchy</el-button>
     </el-main>
     </el-container>
   </div>
@@ -251,6 +253,9 @@ export default Vue.extend({
                 console.log("error is %o", error);
             });
 
+        },
+        loadDemoHierarchy(): void {
+            this.treeData = cloneDeep(ELEMENT_UI_DEMO_HIERARCHY);
         }
     },
     watch: {
